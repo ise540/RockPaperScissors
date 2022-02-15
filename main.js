@@ -5,3 +5,11 @@
 // });
 console.log(application);
 window.application.renderScreen("login")
+
+//login -> token -> player status -> game status
+
+//-----------TODO
+//login -> player-status
+
+
+

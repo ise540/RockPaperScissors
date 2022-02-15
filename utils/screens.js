@@ -61,7 +61,7 @@ function renderWaitingForStartScreen() {
       () =>
         request(
           "game-status",
-          { token: window.token, id: window.game },
+          { token: window.application.token, id: window.application.game },
           (response) => {
             if (response["game-status"].status == "waiting-for-your-move") window.application.renderScreen(response["game-status"].status);
              // window.application.screens[response["game-status"].status];
@@ -91,7 +91,7 @@ function renderWaitingForEnemyMoveScreen () {
       () =>
         request(
           "game-status",
-          { token: window.token, id: window.game },
+          { token: window.application.token, id: window.application.game },
           (response) => {
             //if (response["game-status"].status == "waiting-for-enemy-move")
             window.application.renderScreen(response["game-status"].status);
@@ -112,14 +112,14 @@ function renderWinScreen () {
   const title = document.createElement("h1");
   title.textContent = "Победа";
 
-  // const content = document.createElement("div");
+  const content = document.createElement("div");
 
-  // window.application.renderBlock("move-buttons", content);
-
+  window.application.renderBlock("play-button", content);
+  window.application.renderBlock("to-lobby-button", content);
 
 
   app.appendChild(title);
-  //app.appendChild(content);
+  app.appendChild(content);
 }
 
 function renderLoseScreen () {
@@ -129,13 +129,13 @@ function renderLoseScreen () {
   const title = document.createElement("h1");
   title.textContent = "Поражение";
 
-  // const content = document.createElement("div");
+  const content = document.createElement("div");
 
-  // window.application.renderBlock("move-buttons", content);
-
+  window.application.renderBlock("play-button", content);
+  window.application.renderBlock("to-lobby-button", content);
 
   app.appendChild(title);
-  //app.appendChild(content);
+  app.appendChild(content);
 }
 
 window.application.screens["login"] = renderLoginScreen;

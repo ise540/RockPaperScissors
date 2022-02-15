@@ -16,15 +16,28 @@ function renderLoginButton(container) {
   loginButton.addEventListener("click", () => {
     let params = { login: document.querySelector(".login-input").value };
     request("login", params, (response) => {
-      if (response.status == "ok") {
-        //localStorage.setItem("token", response.token); - Вялая попытка в сохранение токена, подлежит доработке и обсуждению
-        window.token = response.token;
-        window.application.renderScreen("lobby");
-      } else {
+      if (response.status != "ok") {
         const p = document.createElement("p");
         p.textContent = "Введите логин";
         container.appendChild(p);
         setTimeout(() => container.removeChild(p), 1000);
+      } else {
+        window.application.token = response.token;
+
+        request("player-status", { token: window.application.token }, (response) => {
+          if (response["player-status"].status == "game") {
+            window.application.game = response["player-status"].game.id;
+            request(
+              "game-status",
+              { token: window.application.token, id: window.application.game },
+              (response) => {
+                window.application.renderScreen(response["game-status"].status);
+              }
+            );
+          } else {
+            window.application.renderScreen(response["player-status"].status);
+          }
+        });
       }
     });
   });
@@ -34,13 +47,20 @@ function renderLoginButton(container) {
 
 function renderPlayerList(container) {
   const playerList = document.createElement("ul");
-  request("player-list", { token:window.token }, (json) => {
-    json.list.forEach((item) => {
-      const li = document.createElement("li");
-      li.textContent = item.login;
-      playerList.appendChild(li);
-    });
-  });
+
+  window.application.timers.push(
+    setInterval(() => {
+      playerList.innerHTML = "";
+      request("player-list", { token: window.application.token }, (response) => {
+        response.list.forEach((item) => {
+          const li = document.createElement("li");
+          li.textContent = item.login;
+          playerList.appendChild(li);
+        });
+      });
+    }, 1000)
+  );
+
   container.appendChild(playerList);
 }
 
@@ -49,13 +69,16 @@ function renderPlayButton(container) {
   playButton.textContent = "Играть";
 
   playButton.addEventListener("click", () => {
-    request("start", { token: window.token }, (response) => {
+    request("start", { token: window.application.token }, (response) => {
       if (response["player-status"].status == "game") {
-        window.game = response["player-status"].game.id;
-        request("game-status", {token: window.token, id: window.game}, (response)=>{
-          console.log(response["game-status"].status)
-          window.application.renderScreen(response["game-status"].status);
-        } )
+        window.application.game = response["player-status"].game.id;
+        request(
+          "game-status",
+          { token: window.application.token, id: window.application.game },
+          (response) => {
+            window.application.renderScreen(response["game-status"].status);
+          }
+        );
       }
     });
   });
@@ -71,7 +94,7 @@ function renderMovesButtons(container) {
     moveButton.addEventListener("click", () => {
       request(
         "play",
-        { token: window.token, move: item.value, id: window.game },
+        { token: window.application.token, move: item.value, id: window.application.game },
         (response) => {
           window.application.renderScreen(response["game-status"].status);
         }
@@ -82,6 +105,17 @@ function renderMovesButtons(container) {
   });
 }
 
+function renderToLobbyButton(container) {
+  const toLobbyButton = document.createElement("button");
+  toLobbyButton.textContent = "В лобби";
+
+  toLobbyButton.addEventListener("click", () => {
+    window.application.renderScreen("lobby");
+    console.log("event");
+  });
+
+  container.appendChild(toLobbyButton);
+}
 
 window.application.blocks["login-input"] = renderLoginInput;
 window.application.blocks["login-button"] = renderLoginButton;
@@ -89,4 +123,4 @@ window.application.blocks["player-list"] = renderPlayerList;
 window.application.blocks["play-button"] = renderPlayButton;
 
 window.application.blocks["move-buttons"] = renderMovesButtons;
-
+window.application.blocks["to-lobby-button"] = renderToLobbyButton;
