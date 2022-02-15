@@ -1,7 +1,3 @@
-let token;
-let gameId;
-//--------------------------BLOCKS
-
 function renderLoginInput(container) {
   const input = document.createElement("input");
   input.classList.add("login-input");
@@ -22,7 +18,7 @@ function renderLoginButton(container) {
     request("login", params, (response) => {
       if (response.status == "ok") {
         //localStorage.setItem("token", response.token); - Вялая попытка в сохранение токена, подлежит доработке и обсуждению
-        token = response.token;
+        window.token = response.token;
         window.application.renderScreen("lobby");
       } else {
         const p = document.createElement("p");
@@ -38,7 +34,7 @@ function renderLoginButton(container) {
 
 function renderPlayerList(container) {
   const playerList = document.createElement("ul");
-  request("player-list", { token }, (json) => {
+  request("player-list", { token:window.token }, (json) => {
     json.list.forEach((item) => {
       const li = document.createElement("li");
       li.textContent = item.login;
@@ -53,11 +49,13 @@ function renderPlayButton(container) {
   playButton.textContent = "Играть";
 
   playButton.addEventListener("click", () => {
-    request("start", { token: token }, (response) => {
+    request("start", { token: window.token }, (response) => {
       if (response["player-status"].status == "game") {
-        console.log(response["player-status"].game.id);
-        gameId = response["player-status"].game.id;
-        window.application.renderScreen("game");
+        window.game = response["player-status"].game.id;
+        request("game-status", {token: window.token, id: window.game}, (response)=>{
+          console.log(response["game-status"].status)
+          window.application.renderScreen(response["game-status"].status);
+        } )
       }
     });
   });
@@ -73,9 +71,9 @@ function renderMovesButtons(container) {
     moveButton.addEventListener("click", () => {
       request(
         "play",
-        { token: token, move: item.value, id: gameId },
+        { token: window.token, move: item.value, id: window.game },
         (response) => {
-          console.log(response);
+          window.application.renderScreen(response["game-status"].status);
         }
       );
     });
