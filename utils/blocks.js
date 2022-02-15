@@ -1,4 +1,4 @@
-let token; 
+let token;
 let gameId;
 //--------------------------BLOCKS
 
@@ -38,7 +38,7 @@ function renderLoginButton(container) {
 
 function renderPlayerList(container) {
   const playerList = document.createElement("ul");
-  request("player-list", {token,}, (json) => {
+  request("player-list", { token }, (json) => {
     json.list.forEach((item) => {
       const li = document.createElement("li");
       li.textContent = item.login;
@@ -55,7 +55,7 @@ function renderPlayButton(container) {
   playButton.addEventListener("click", () => {
     request("start", { token: token }, (response) => {
       if (response["player-status"].status == "game") {
-          console.log(response["player-status"].game.id)
+        console.log(response["player-status"].game.id);
         gameId = response["player-status"].game.id;
         window.application.renderScreen("game");
       }
@@ -65,50 +65,30 @@ function renderPlayButton(container) {
   container.appendChild(playButton);
 }
 
-function renderRockButton(container) {
-  const rockButton = document.createElement("button");
-  rockButton.textContent = "Камень";
+function renderMovesButtons(container) {
+  window.application.moves.forEach((item) => {
+    const moveButton = document.createElement("button");
+    moveButton.textContent = item.translate;
 
-  rockButton.addEventListener("click", () => {
-    request("play", { token, move: "rock", id: gameId }, (response) => {
-      console.log(response);
+    moveButton.addEventListener("click", () => {
+      request(
+        "play",
+        { token: token, move: item.value, id: gameId },
+        (response) => {
+          console.log(response);
+        }
+      );
     });
-  });
 
-  container.appendChild(rockButton);
+    container.appendChild(moveButton);
+  });
 }
 
-function renderPaperButton(container) {
-  const paperButton = document.createElement("button");
-  paperButton.textContent = "Бумага";
-
-  paperButton.addEventListener("click", () => {
-    request("play", { token: token, move: "paper", id: gameId }, (response) => {
-      console.log(response);
-    });
-  });
-
-  container.appendChild(paperButton);
-}
-
-function renderScissorsButton(container) {
-  const scissorsButton = document.createElement("button");
-  scissorsButton.textContent = "Ножницы";
-
-  scissorsButton.addEventListener("click", () => {
-    request("play", { token, move: "scissors", id: gameId }, (response) => {
-      console.log(response);
-    });
-  });
-
-  container.appendChild(scissorsButton);
-}
 
 window.application.blocks["login-input"] = renderLoginInput;
 window.application.blocks["login-button"] = renderLoginButton;
 window.application.blocks["player-list"] = renderPlayerList;
 window.application.blocks["play-button"] = renderPlayButton;
 
-window.application.blocks["rock-button"] = renderRockButton;
-window.application.blocks["paper-button"] = renderPaperButton;
-window.application.blocks["scissors-button"] = renderScissorsButton;
+window.application.blocks["move-buttons"] = renderMovesButtons;
+

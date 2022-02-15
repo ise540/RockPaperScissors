@@ -8,4 +8,18 @@ window.application = {
     this.blocks[blockName](container);
   },
   timers: [],
+  moves: [
+    {
+      value: "rock",
+      translate: "Камень",
+    },
+    {
+      value: "scissors",
+      translate: "Ножницы",
+    },
+    {
+      value: "paper",
+      translate: "Бумага",
+    },
+  ],
 };

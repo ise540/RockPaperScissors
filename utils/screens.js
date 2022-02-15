@@ -39,9 +39,7 @@ function renderLoginScreen() {
   
     const content = document.createElement("div");
   
-    window.application.renderBlock("rock-button", content);
-    window.application.renderBlock("scissors-button", content);
-    window.application.renderBlock("paper-button", content);
+    window.application.renderBlock("move-buttons", content);
   
     app.appendChild(title);
     app.appendChild(content);
