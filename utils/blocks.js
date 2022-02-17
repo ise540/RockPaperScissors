@@ -5,8 +5,8 @@ function renderLoginInput(container) {
   const buttonTitle = document.createElement("p");
   buttonTitle.textContent = "Никнейм";
 
-  container.appendChild(buttonTitle);
-  container.appendChild(input);
+  container.append(buttonTitle);
+  container.append(input);
 }
 
 function renderLoginButton(container) {
@@ -19,49 +19,73 @@ function renderLoginButton(container) {
       if (response.status != "ok") {
         const p = document.createElement("p");
         p.textContent = "Введите логин";
-        container.appendChild(p);
+        container.append(p);
         setTimeout(() => container.removeChild(p), 1000);
       } else {
         window.application.token = response.token;
 
-        request("player-status", { token: window.application.token }, (response) => {
-          if (response["player-status"].status == "game") {
-            window.application.game = response["player-status"].game.id;
-            request(
-              "game-status",
-              { token: window.application.token, id: window.application.game },
-              (response) => {
-                window.application.renderScreen(response["game-status"].status);
-              }
-            );
-          } else {
-            window.application.renderScreen(response["player-status"].status);
+        request(
+          "player-status",
+          { token: window.application.token },
+          (response) => {
+            if (response["player-status"].status == "game") {
+              window.application.game = response["player-status"].game.id;
+              request(
+                "game-status",
+                {
+                  token: window.application.token,
+                  id: window.application.game,
+                },
+                (response) => {
+                  window.application.renderScreen(
+                    response["game-status"].status
+                  );
+                }
+              );
+            } else {
+              window.application.renderScreen(response["player-status"].status);
+            }
           }
-        });
+        );
       }
     });
   });
 
-  container.appendChild(loginButton);
+  container.append(loginButton);
 }
 
 function renderPlayerList(container) {
   const playerList = document.createElement("ul");
 
-  window.application.timers.push(
-    setInterval(() => {
-      playerList.innerHTML = "";
-      request("player-list", { token: window.application.token }, (response) => {
-        response.list.forEach((item) => {
-          const li = document.createElement("li");
-          li.textContent = item.login;
-          playerList.appendChild(li);
-        });
-      });
-    }, 1000)
-  );
+  const getPlayers = () => {
+    request("player-list", { token: window.application.token }, (response) => {
+      window.application.players = window.application.players ?? [];
 
-  container.appendChild(playerList);
+      const isSame =
+        window.application.players.length ==
+          response.list.map((item) => item.login).length &&
+        window.application.players.every(function (element, index) {
+          return element === response.list.map((item) => item.login)[index];
+        });
+
+      if (isSame == false) {
+        window.application.players = response.list.map((item) => item.login);
+        playerList.innerHTML = "";
+
+        window.application.players.forEach((player) => {
+          const li = document.createElement("li");
+          li.textContent = player;
+          playerList.append(li);
+        });
+      }
+
+    });
+  };
+  getPlayers();
+
+  window.application.timers.push(setInterval(getPlayers, 1000));
+
+  container.append(playerList);
 }
 
 function renderPlayButton(container) {
@@ -83,7 +107,7 @@ function renderPlayButton(container) {
     });
   });
 
-  container.appendChild(playButton);
+  container.append(playButton);
 }
 
 function renderMovesButtons(container) {
@@ -94,14 +118,18 @@ function renderMovesButtons(container) {
     moveButton.addEventListener("click", () => {
       request(
         "play",
-        { token: window.application.token, move: item.value, id: window.application.game },
+        {
+          token: window.application.token,
+          move: item.value,
+          id: window.application.game,
+        },
         (response) => {
           window.application.renderScreen(response["game-status"].status);
         }
       );
     });
 
-    container.appendChild(moveButton);
+    container.append(moveButton);
   });
 }
 
@@ -114,7 +142,7 @@ function renderToLobbyButton(container) {
     console.log("event");
   });
 
-  container.appendChild(toLobbyButton);
+  container.append(toLobbyButton);
 }
 
 window.application.blocks["login-input"] = renderLoginInput;

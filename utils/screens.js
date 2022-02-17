@@ -15,6 +15,7 @@ function renderLoginScreen() {
 }
 
 function renderLobbyScreen() {
+  
   const app = document.querySelector(".app");
   app.textContent = "";
 
