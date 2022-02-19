@@ -56,6 +56,7 @@ function renderWaitingForStartScreen() {
   const content = document.createElement("div");
 
   window.application.renderBlock("wait-for-start", content);
+  window.application.renderBlock("loader", content);
 
   app.append(title);
   app.append(content);
@@ -73,6 +74,7 @@ function renderWaitingForEnemyMoveScreen() {
 
   window.application.renderBlock("get-enemy-name", content);
   window.application.renderBlock("wait-for-enemy-move", content);
+  window.application.renderBlock("loader", content);
   
 
   app.append(title);

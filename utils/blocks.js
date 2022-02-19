@@ -160,6 +160,8 @@ function renderPlayButton(container) {
   container.append(playButton);
 }
 
+// ------------- СТРОКА ИМЯ ПРОТИВНИКА
+
 function renderEnemyName(container) {
   const enemyName = document.createElement("p");
 
@@ -213,6 +215,18 @@ function renderToLobbyButton(container) {
   container.append(toLobbyButton);
 }
 
+function renderLoader(container) {
+  const loader = document.createElement("div");
+  loader.classList.add("loader");
+
+  for(let i=1; i<6; i++) {
+    let item = document.createElement("div");
+    item.classList.add("item", `item-${i}`);
+    loader.append(item);
+  }
+  container.append(loader);
+}
+
 window.application.blocks["login-input"] = renderLoginInput;
 window.application.blocks["login-button"] = renderLoginButton;
 window.application.blocks["player-list"] = renderPlayerList;
@@ -223,3 +237,4 @@ window.application.blocks["to-lobby-button"] = renderToLobbyButton;
 window.application.blocks["wait-for-enemy-move"] = renderWaitForEnemyMove;
 window.application.blocks["wait-for-start"] = renderWaitForStart;
 window.application.blocks["get-enemy-name"] = renderEnemyName;
+window.application.blocks["loader"] = renderLoader;
