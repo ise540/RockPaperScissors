@@ -3,6 +3,8 @@ window.application = {
   screens: {},
   renderScreen: function (screenName) {
     this.timers.forEach(item=>clearInterval(item));
+    this.timers.length = 0;
+    this.players.length = 0;
     this.screens[screenName]();
   },
   renderBlock: function (blockName, container) {
@@ -23,4 +25,5 @@ window.application = {
       translate: "Бумага",
     },
   ],
+  players:[]
 };

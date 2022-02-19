@@ -1,3 +1,5 @@
+// -------------ЛОГИН ИНПУТ
+
 function renderLoginInput(container) {
   const input = document.createElement("input");
   input.classList.add("login-input");
@@ -8,6 +10,8 @@ function renderLoginInput(container) {
   container.append(buttonTitle);
   container.append(input);
 }
+
+//------------ ЛОГИН КНОПКА
 
 function renderLoginButton(container) {
   const loginButton = document.createElement("button");
@@ -54,7 +58,10 @@ function renderLoginButton(container) {
   container.append(loginButton);
 }
 
+//------------ СПИСОК ИГРОКОВ
+
 function renderPlayerList(container) {
+  console.log("player-list")
   const playerList = document.createElement("ul");
 
   const getPlayers = () => {
@@ -78,7 +85,6 @@ function renderPlayerList(container) {
           playerList.append(li);
         });
       }
-
     });
   };
   getPlayers();
@@ -87,6 +93,50 @@ function renderPlayerList(container) {
 
   container.append(playerList);
 }
+
+//------------ БЛОК ОЖИДАНИЯ ХОДА
+
+function renderWaitForEnemyMove(container) {
+  const title = document.createElement("h2");
+  title.textContent = "Ожидаем ход соперника...";
+  container.append(title);
+
+  const waitForEnemyMove = () => {
+    request(
+      "game-status",
+      { token: window.application.token, id: window.application.game },
+      (response) => {
+        if (response["game-status"].status !== "waiting-for-enemy-move")
+          window.application.renderScreen(response["game-status"].status);
+      }
+    );
+  };
+
+  window.application.timers.push(setInterval(waitForEnemyMove, 500));
+}
+
+// ------------ БЛОК ОЖИДАНИЯ ПОДКЛЮЧЕНИЯ
+
+function renderWaitForStart(container) {
+  const title = document.createElement("h2");
+  title.textContent = "Ожидаем подключение соперника...";
+  container.append(title);
+
+  const waitForStart = () => {
+    request(
+      "game-status",
+      { token: window.application.token, id: window.application.game },
+      (response) => {
+        if (response["game-status"].status !== "waiting-for-start")
+          window.application.renderScreen(response["game-status"].status);
+      }
+    );
+  };
+
+  window.application.timers.push(setInterval(waitForStart, 500));
+}
+
+// ------------ КНОПКА НАЧАЛА ИГРЫ
 
 function renderPlayButton(container) {
   const playButton = document.createElement("button");
@@ -109,6 +159,23 @@ function renderPlayButton(container) {
 
   container.append(playButton);
 }
+
+function renderEnemyName(container) {
+  const enemyName = document.createElement("p");
+
+  request(
+    "game-status",
+    { token: window.application.token, id: window.application.game },
+    (response) => {
+      enemyName.textContent =
+        "Вы против " + response["game-status"].enemy.login;
+    }
+  );
+
+  container.append(enemyName);
+}
+
+// ------------ БЛОК КНОПОК ХОДОВ
 
 function renderMovesButtons(container) {
   window.application.moves.forEach((item) => {
@@ -133,13 +200,14 @@ function renderMovesButtons(container) {
   });
 }
 
+// ------------ БЛОК ВОЗВРАТ В ЛОББИ
+
 function renderToLobbyButton(container) {
   const toLobbyButton = document.createElement("button");
   toLobbyButton.textContent = "В лобби";
 
   toLobbyButton.addEventListener("click", () => {
     window.application.renderScreen("lobby");
-    console.log("event");
   });
 
   container.append(toLobbyButton);
@@ -152,3 +220,6 @@ window.application.blocks["play-button"] = renderPlayButton;
 
 window.application.blocks["move-buttons"] = renderMovesButtons;
 window.application.blocks["to-lobby-button"] = renderToLobbyButton;
+window.application.blocks["wait-for-enemy-move"] = renderWaitForEnemyMove;
+window.application.blocks["wait-for-start"] = renderWaitForStart;
+window.application.blocks["get-enemy-name"] = renderEnemyName;
