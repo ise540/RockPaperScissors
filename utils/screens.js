@@ -6,6 +6,7 @@ function renderLoginScreen() {
   title.textContent = "Камень, ножницы, бумага";
 
   const content = document.createElement("div");
+  content.classList.add("content");
 
   window.application.renderBlock("login-input", content);
   window.application.renderBlock("login-button", content);
@@ -22,6 +23,8 @@ function renderLobbyScreen() {
   title.textContent = "Лобби";
 
   const content = document.createElement("div");
+  content.classList.add("content");
+
 
   window.application.renderBlock("player-list", content);
   window.application.renderBlock("play-button", content);
@@ -38,6 +41,8 @@ function renderWaitingForYourMoveScreen() {
   title.textContent = "Игра";
 
   const content = document.createElement("div");
+  content.classList.add("content");
+
 
   window.application.renderBlock("get-enemy-name", content);
   window.application.renderBlock("move-buttons", content);
@@ -54,9 +59,14 @@ function renderWaitingForStartScreen() {
   title.textContent = "Игра";
 
   const content = document.createElement("div");
+  content.classList.add("content");
 
-  window.application.renderBlock("wait-for-start", content);
-  window.application.renderBlock("loader", content);
+  const contentContainer = document.createElement("div");
+  contentContainer.classList.add("content-container");
+  content.append(contentContainer);
+
+  window.application.renderBlock("wait-for-start", contentContainer);
+  window.application.renderBlock("loader", contentContainer);
 
   app.append(title);
   app.append(content);
@@ -71,14 +81,21 @@ function renderWaitingForEnemyMoveScreen() {
   title.textContent = "Игра";
 
   const content = document.createElement("div");
+  content.classList.add("content");
+
+  const contentContainer = document.createElement("div");
+  contentContainer.classList.add("content-container");
+  
+
 
   window.application.renderBlock("get-enemy-name", content);
-  window.application.renderBlock("wait-for-enemy-move", content);
-  window.application.renderBlock("loader", content);
+  window.application.renderBlock("wait-for-enemy-move", contentContainer);
+  window.application.renderBlock("loader", contentContainer);
   
 
   app.append(title);
   app.append(content);
+  content.append(contentContainer);
 }
 
 function renderWinScreen() {
@@ -89,6 +106,8 @@ function renderWinScreen() {
   title.textContent = "Вы победили!";
 
   const content = document.createElement("div");
+  content.classList.add("content");
+
 
   window.application.renderBlock("get-enemy-name", content);
   window.application.renderBlock("play-button", content);
@@ -106,6 +125,8 @@ function renderLoseScreen() {
   title.textContent = "Вы проиграли!";
 
   const content = document.createElement("div");
+  content.classList.add("content");
+
 
   window.application.renderBlock("get-enemy-name", content);
   window.application.renderBlock("play-button", content);

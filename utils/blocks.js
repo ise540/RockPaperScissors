@@ -5,7 +5,7 @@ function renderLoginInput(container) {
   input.classList.add("login-input");
 
   const buttonTitle = document.createElement("p");
-  buttonTitle.textContent = "Никнейм";
+  buttonTitle.textContent = "Введите имя";
 
   container.append(buttonTitle);
   container.append(input);
@@ -15,7 +15,8 @@ function renderLoginInput(container) {
 
 function renderLoginButton(container) {
   const loginButton = document.createElement("button");
-  loginButton.textContent = "Логин";
+  loginButton.classList.add("login-button");
+  loginButton.textContent = "Войти";
 
   loginButton.addEventListener("click", () => {
     let params = { login: document.querySelector(".login-input").value };
@@ -61,8 +62,8 @@ function renderLoginButton(container) {
 //------------ СПИСОК ИГРОКОВ
 
 function renderPlayerList(container) {
-  console.log("player-list")
   const playerList = document.createElement("ul");
+  playerList.classList.add("player-list");
 
   const getPlayers = () => {
     request("player-list", { token: window.application.token }, (response) => {
@@ -106,8 +107,13 @@ function renderWaitForEnemyMove(container) {
       "game-status",
       { token: window.application.token, id: window.application.game },
       (response) => {
-        if (response["game-status"].status !== "waiting-for-enemy-move")
+        if (response["game-status"].status !== "waiting-for-enemy-move") {
           window.application.renderScreen(response["game-status"].status);
+        }
+        else if(response.status !== "ok") {
+          console.error(`${response.status} ${response.message}`);
+          window.application.renderScreen("login");
+        }
       }
     );
   };
@@ -127,8 +133,12 @@ function renderWaitForStart(container) {
       "game-status",
       { token: window.application.token, id: window.application.game },
       (response) => {
-        if (response["game-status"].status !== "waiting-for-start")
+        if (response["game-status"].status !== "waiting-for-start") {
           window.application.renderScreen(response["game-status"].status);
+        } else if(response.status !== "ok") {
+          console.error(`${response.status} ${response.message}`);
+          window.application.renderScreen("login");
+        }
       }
     );
   };
@@ -140,6 +150,7 @@ function renderWaitForStart(container) {
 
 function renderPlayButton(container) {
   const playButton = document.createElement("button");
+  playButton.classList.add("play-button");
   playButton.textContent = "Играть";
 
   playButton.addEventListener("click", () => {
@@ -154,6 +165,10 @@ function renderPlayButton(container) {
           }
         );
       }
+      else {
+        console.error(`${response.status} ${response.message}`);
+        window.application.renderScreen("login");
+      }
     });
   });
 
@@ -164,6 +179,7 @@ function renderPlayButton(container) {
 
 function renderEnemyName(container) {
   const enemyName = document.createElement("p");
+  enemyName.classList.add("enemy-name");
 
   request(
     "game-status",
@@ -180,8 +196,12 @@ function renderEnemyName(container) {
 // ------------ БЛОК КНОПОК ХОДОВ
 
 function renderMovesButtons(container) {
+  const moveBlock = document.createElement("div");
+  moveBlock.classList.add("move-block");
+
   window.application.moves.forEach((item) => {
     const moveButton = document.createElement("button");
+    moveButton.classList.add("move-button");
     moveButton.textContent = item.translate;
 
     moveButton.addEventListener("click", () => {
@@ -193,19 +213,26 @@ function renderMovesButtons(container) {
           id: window.application.game,
         },
         (response) => {
+          if(response.status !== "error")
           window.application.renderScreen(response["game-status"].status);
+          else {
+            console.error(`${response.status} ${response.message}`);
+            window.application.renderScreen("login");
+          }
         }
       );
     });
-
-    container.append(moveButton);
+    moveBlock.append(moveButton);
   });
+
+  container.append(moveBlock);
 }
 
 // ------------ БЛОК ВОЗВРАТ В ЛОББИ
 
 function renderToLobbyButton(container) {
   const toLobbyButton = document.createElement("button");
+  toLobbyButton.classList.add("to-lobby-button");
   toLobbyButton.textContent = "В лобби";
 
   toLobbyButton.addEventListener("click", () => {
@@ -215,11 +242,13 @@ function renderToLobbyButton(container) {
   container.append(toLobbyButton);
 }
 
+//-------ЛОАДЕР
+
 function renderLoader(container) {
   const loader = document.createElement("div");
   loader.classList.add("loader");
 
-  for(let i=1; i<6; i++) {
+  for (let i = 1; i < 6; i++) {
     let item = document.createElement("div");
     item.classList.add("item", `item-${i}`);
     loader.append(item);
