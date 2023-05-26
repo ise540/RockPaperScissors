@@ -6,7 +6,7 @@ function request(url, params, callback) {
     const xhr = new XMLHttpRequest();
     xhr.open(
       "GET",
-      `https://morning-beyond-90272.herokuapp.com/${url}?${paramsString}`
+      `https://rps-zonest64.b4a.run/${url}?${paramsString}`
     );
     xhr.send();
     xhr.addEventListener("readystatechange", () => {
